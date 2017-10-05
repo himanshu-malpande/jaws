@@ -1,0 +1,7 @@
+{
+	"development": {
+		"database": "jaws_test",
+		"username": "root",
+		"password": "password"
+	}
+}
