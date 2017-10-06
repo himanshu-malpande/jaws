@@ -127,14 +127,18 @@
 
 			$resource = $this->prependBaseResource($resource);
 
-			$route = new Route;
-			$route->route = $resource;
-			$route->handler = $action;
-			$route->method = $method;
-			$route->name = $name;
-			$route->constraint = $constraints;
+			$params = $this->getParamsFromRoute($resource);
 
-			$this->routes[] = $route;
+			$resource = $this->normalizeParameterizedRoute($resource);
+
+			$this->routes[] = $this->constructRouteObject($resource, $action, $method, $name, $constraints, $params);
+
+		}
+
+		private function getControllerName($resource) {
+
+			$resource = trim($resource, "/");
+			return substr($resource, 0, strpos($resource, "/"));
 
 		}
 
@@ -149,10 +153,34 @@
 
 		}
 
-		private function getControllerName($resource) {
+		private function getParamsFromRoute($resource) {
 
-			$resource = trim($resource, "/");
-			return substr($resource, 0, strpos($resource, "/"));
+			$matches = [];
+			$params = [];
+			preg_match_all("/\\/:\\w+/", $resource, $matches);
+			foreach ($matches[0] as $match) {
+				$params[] = substr($match, 1);
+			}
+
+			return $params;
+
+		}
+
+		private function normalizeParameterizedRoute($resource) {
+			return preg_replace("/\\/:\\w+/", "/:param", $resource);
+		}
+
+		private function constructRouteObject($resource, $action, $method, $name, $constraints, $params) {
+
+			$route = new Route;
+			$route->route = $resource;
+			$route->handler = $action;
+			$route->method = $method;
+			$route->name = $name;
+			$route->constraint = $constraints;
+			$route->params = $params;
+
+			return $route;
 
 		}
 

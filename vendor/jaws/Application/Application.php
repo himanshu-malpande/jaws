@@ -8,6 +8,8 @@
 
 		private $__config;
 
+		$__contentNegotiator;
+
 		private static $_instance = null;
 
 		static function getSharedInstance($env = false) {
@@ -37,6 +39,9 @@
 				"viewsPath" => "../app/views/",
 				"configPath" => "../config/"
 			]);
+
+			$this->__contentNegotiator = ContentNegotiator::getSharedInstance();
+			$this->__contentNegotiator->buildAcceptableContentArray($_SERVER["Accept"]);
 
 			$this->__routes = Routes::getSharedInstance();
 

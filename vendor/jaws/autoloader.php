@@ -3,6 +3,8 @@
 	function autoloader($className) {
 
 		$splAutoloads = [
+			"ContentType" => "HTTP/ContentType",
+			"ContentNegotiator" => "HTTP/ContentNegotiator",
 			"Model" => "Data/Model",
 			"Application" => "Application/Application",
 			"Configuration" => "Application/Configuration",

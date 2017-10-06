@@ -11,6 +11,8 @@
 
 		private $__namedRoutes = [];
 
+		private $__contentNegotiator;
+
 		private static $_sharedInstance;
 
 		static function getSharedInstance() {
@@ -22,15 +24,14 @@
 
 		}
 
-		private function __construct() {}
+		private function __construct() {
+			$this->__contentNegotiator = ContentNegotiator::getSharedInstance();
+		}
 
 		function map($mapper) {
 
 			$routeSet = new RouteSet();
 			($mapper->bindTo($routeSet))();
-
-			// echo "<pre>";
-			// var_dump($routeSet->routes);
 
 			foreach ($routeSet->routes as $route) {
 				$this->prepareRoute($route);
