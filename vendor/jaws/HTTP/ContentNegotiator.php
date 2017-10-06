@@ -18,12 +18,15 @@
 
 		function buildAcceptableContentArray($acceptHeader) {
 
-			$contentTypes = [];
-			$acceptValues = explode(",", $acceptHeader);
-			foreach ($acceptValues as $accept) {
+			$matches = [];
+			preg_match_all("/(((\w+|\*)\/(\w+((\+\w+)|(-\w+)+)?|\*))((;[^\W\dA-Z && q]+=\d)*(,\s*((\w+|\*)\/(\w+((\+\w+)|(-\w+)+)?|\*)))*(;[^\W\dA-Z && q]+=\d)*)*)(;q+=\d(.\d)?)*/", $acceptHeader, $matches);
 
-				$accept = trim($accept);
-				$contentTypes[] = $this->getContentTypeWithQFactor($accept);
+			$mediaTypes = $matches[1];
+			$contentTypes = [];
+			for ($i=0; $i < count($matches[1]); $i++) {
+
+				$qFactor = explode("=", substr($matches[0][$i], strlen($matches[1][$i])))[1];
+				$contentTypes = array_merge($contentTypes, $this->getAllMediaTypesOfSameQFactor($matches[1][$i], floatval($qFactor)));
 
 			}
 
@@ -31,39 +34,36 @@
 
 		}
 
-		private function getContentTypeWithQFactor($pair) {
+		private function getAllMediaTypesOfSameQFactor($mediaTypes, $qFactor) {
 
-			$keyQPair = explode(";", $pair);
-
-			if (empty($keyQPair[1])) {
-				$keyQPair[] = 1.0;
-			}
-			else {
-
-				for ($i=1; $i < count($keyQPair); $i++) {
-
-					$props = explode("=", $keyQPair[$i]);
-					if (strtolower($props[0]) == "q") {
-						$keyQPair[1] = floatval($props[1]);
-					}
-					else if (strtolower($props[0]) == "level") {
-						$keyQPair[2] = floatval($props[1]);
-					}
-
-				}
-
+			$allTypes = explode(",", $mediaTypes);
+			$ret = [];
+			foreach ($allTypes as $eachType) {
+				$ret[] = $this->decodeMediaTypeInfo($eachType, $qFactor);
 			}
 
-			return $this->constructContentTypeObject($keyQPair);
+			return $ret;
 
 		}
 
-		private function constructContentTypeObject($mediaTypeObject) {
+		private function decodeMediaTypeInfo($mediaType, $qFactor) {
+
+			$mediaInfo = explode(";", $mediaType);
+			$level = false;
+			if (isset($mediaInfo[1])) {
+				$level = floatval(explode("=", $mediaInfo[1])[1]);
+			}
+
+			return $this->constructContentTypeObject(trim($mediaInfo[0]), $level, $qFactor);
+
+		}
+
+		private function constructContentTypeObject($mediaType, $level, $qFactor) {
 
 			$contentType = new ContentType;
-			$contentType->mediaType = $mediaTypeObject[0];
-			$contentType->qualityFactor = $mediaTypeObject[1];
-			$contentType->level = (isset($mediaTypeObject[2]) ? $mediaTypeObject[2] : 0);
+			$contentType->mediaType = $mediaType;
+			$contentType->qualityFactor = $qFactor;
+			$contentType->level = $level;
 
 			return $contentType;
 
