@@ -23,7 +23,7 @@
 			foreach ($acceptValues as $accept) {
 
 				$accept = trim($accept);
-				$contentTypes[] = getContentTypeWithQFactor($accept);
+				$contentTypes[] = $this->getContentTypeWithQFactor($accept);
 
 			}
 
@@ -42,7 +42,7 @@
 
 				for ($i=1; $i < count($keyQPair); $i++) {
 
-					$props = explode("=", $keyQpair[$i]);
+					$props = explode("=", $keyQPair[$i]);
 					if (strtolower($props[0]) == "q") {
 						$keyQPair[1] = floatval($props[1]);
 					}

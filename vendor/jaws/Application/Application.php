@@ -8,7 +8,7 @@
 
 		private $__config;
 
-		$__contentNegotiator;
+		private $__contentNegotiator;
 
 		private static $_instance = null;
 
@@ -41,7 +41,11 @@
 			]);
 
 			$this->__contentNegotiator = ContentNegotiator::getSharedInstance();
-			$this->__contentNegotiator->buildAcceptableContentArray($_SERVER["Accept"]);
+			$this->__contentNegotiator->buildAcceptableContentArray($_SERVER["HTTP_ACCEPT"]);
+
+			echo "<pre>";
+			echo $_SERVER["HTTP_ACCEPT"]."<br>";
+			var_dump($this->__contentNegotiator->contentTypes);
 
 			$this->__routes = Routes::getSharedInstance();
 
