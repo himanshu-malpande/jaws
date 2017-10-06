@@ -11,8 +11,6 @@
 	$app = Application::getSharedInstance(getenv("JAWS_ENV"));
 	$app->run();
 
-	// echo $app->routes->getAllRoutes();
-
 	$end = microtime(true);
 
 	echo "<br><br>Request execution time: ".($end - $start);

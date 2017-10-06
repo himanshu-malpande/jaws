@@ -9,10 +9,10 @@
 			"Application" => "Application/Application",
 			"Configuration" => "Application/Configuration",
 			"Database" => "Data/Database",
-			"Routes" => "URL/Routing/Routes",
-			"RouteSet" => "URL/Routing/RouteSet",
-			"Route" => "URL/Routing/Route",
-			"RouteBuilder" => "URL/Routing/Helpers/RouteBuilder"
+			"Routes" => "URI/Routing/Routes",
+			"RouteSet" => "URI/Routing/RouteSet",
+			"Route" => "URI/Routing/Route",
+			"RouteBuilder" => "URI/Routing/Helpers/RouteBuilder"
 		];
 
 		if (isset($splAutoloads[$className])) {

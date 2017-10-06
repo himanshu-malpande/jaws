@@ -1,5 +1,5 @@
 <?php
 
-	Application::getSharedInstance()->UseAcceptHeader = true;
+	// Application::getSharedInstance()->UseAcceptHeader = true;
 
 ?>

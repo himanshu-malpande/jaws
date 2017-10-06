@@ -3,7 +3,6 @@
 	class Application {
 
 		private $__environment;
-		private $__useAcceptHeader;
 		private $__routes;
 
 		private $__config;
@@ -40,13 +39,6 @@
 				"configPath" => "../config/"
 			]);
 
-			$this->__contentNegotiator = ContentNegotiator::getSharedInstance();
-			$this->__contentNegotiator->buildAcceptableContentArray($_SERVER["HTTP_ACCEPT"]);
-
-			echo "<pre>";
-			echo $_SERVER["HTTP_ACCEPT"]."<br>";
-			var_dump($this->__contentNegotiator->contentTypes);
-
 			$this->__routes = Routes::getSharedInstance();
 
 			require_once $this->__config->configPath."routes.php";
@@ -56,6 +48,22 @@
 			Model::staticInit();
 
 			require_once $this->__config->configPath."app.php";
+
+			if (!$this->isCli()) {
+
+				$this->__contentNegotiator = ContentNegotiator::getSharedInstance();
+				$this->__contentNegotiator->buildAcceptableContentArray($_SERVER["HTTP_ACCEPT"]);
+
+				$this->__routes->parseRequest($_SERVER["REQUEST_URI"]);
+
+			}
+			else {
+
+				$args = $_SERVER["argv"];
+				array_shift($args);
+				$this->__routes->parseRequest($args);
+
+			}
 
 		}
 
@@ -76,6 +84,15 @@
 			}
 
 			$this->{"__".$key} = $value;
+
+		}
+
+		function isCli() {
+
+			if (isset($_SERVER["argc"]) && is_numeric($_SERVER["argc"]) && (substr(PHP_SAPI, 0, 3) == "cli") && (substr(php_sapi_name(), 0, 3) == "cli")) {
+				return true;
+			}
+			return false;
 
 		}
 

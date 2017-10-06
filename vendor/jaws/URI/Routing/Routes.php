@@ -55,7 +55,25 @@
 			return json_encode(["get" => $this->__get, "post" => $this->__post, "put" => $this->__put, "patch" => $this->__patch, "delete" => $this->__delete]);
 		}
 
-		function parseRequest() {
+		function parseRequest($uri) {
+
+			if (is_array($uri)) {
+
+				foreach ($uri as $request) {
+					$this->processUri($request);
+				}
+
+			}
+			else {
+				$this->processUri($uri);
+			}
+
+		}
+
+		private function processUri($uri) {
+
+			$uriFragments = explode("/", trim($uri, "/ \t\r\n"));
+
 		}
 
 	}
