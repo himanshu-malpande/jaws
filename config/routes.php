@@ -7,6 +7,10 @@
 		});
 		$this->resources("courses");
 
+		$this->root("students/show");
+
+		$this->get("courses/:course_id/students/:student_id", "enrollments/show");
+
 	});
 
 ?>

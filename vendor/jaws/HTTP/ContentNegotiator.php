@@ -71,19 +71,19 @@
 
 		private function sortContentTypes($contentTypes) {
 
-			usort($contentTypes, function($a, $b) {
+			// usort($contentTypes, function($a, $b) {
 
-				if ($a->qualityFactor > $b->qualityFactor) {
-					return -1;
-				}
-				else if ($a->qualityFactor < $b->qualityFactor) {
-					return 1;
-				}
-				else if ($a->qualityFactor == $b->qualityFactor) {
-					return -1;
-				}
+			// 	if ($a->qualityFactor > $b->qualityFactor) {
+			// 		return -1;
+			// 	}
+			// 	else if ($a->qualityFactor < $b->qualityFactor) {
+			// 		return 1;
+			// 	}
+			// 	else if ($a->qualityFactor == $b->qualityFactor) {
+			// 		return -1;
+			// 	}
 
-			});
+			// });
 
 			return $contentTypes;
 

@@ -6,6 +6,7 @@
 		private $__modelsPath;
 		private $__viewsPath;
 		private $__configPath;
+		private $__documentRoot;
 
 		private static $_sharedInstance;
 
@@ -24,6 +25,7 @@
 			$this->__modelsPath = $params["modelsPath"];
 			$this->__viewsPath = $params["viewsPath"];
 			$this->__configPath = $params["configPath"];
+			$this->__documentRoot = $params["documentRoot"];
 
 		}
 

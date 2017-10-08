@@ -9,6 +9,8 @@
 
 		private $__contentNegotiator;
 
+		private $__documentRoot;
+
 		private static $_instance = null;
 
 		static function getSharedInstance($env = false) {
@@ -32,36 +34,21 @@
 
 		function run() {
 
-			$this->__config = Configuration::getSharedInstance([
-				"controllersPath" => "../app/controllers/",
-				"modelsPath" => "../app/models/",
-				"viewsPath" => "../app/views/",
-				"configPath" => "../config/"
-			]);
-
-			$this->__routes = Routes::getSharedInstance();
-
-			require_once $this->__config->configPath."routes.php";
-
-			Database::getSharedInstance($this->__config->configPath."db.json", $this);
-
-			Model::staticInit();
-
-			require_once $this->__config->configPath."app.php";
+			$this->initialize();
 
 			if (!$this->isCli()) {
 
 				$this->__contentNegotiator = ContentNegotiator::getSharedInstance();
 				$this->__contentNegotiator->buildAcceptableContentArray($_SERVER["HTTP_ACCEPT"]);
 
-				$this->__routes->parseRequest($_SERVER["REQUEST_URI"]);
+				$this->__routes->processRequest($_SERVER["REQUEST_URI"], $_SERVER["REQUEST_METHOD"]);
 
 			}
 			else {
 
 				$args = $_SERVER["argv"];
 				array_shift($args);
-				$this->__routes->parseRequest($args);
+				$this->__routes->processRequest($args, "GET");
 
 			}
 
@@ -80,7 +67,7 @@
 
 			$key = lcfirst($key);
 			if ($key == "Environment") {
-				throw new Exception("Cannot reinitialize Environment", 1);
+				throw new Exception("Cannot initialize readonly property Environment of the application", 1);
 			}
 
 			$this->{"__".$key} = $value;
@@ -93,6 +80,35 @@
 				return true;
 			}
 			return false;
+
+		}
+
+		private function initialize() {
+
+			if ($this->isCli()) {
+				$this->__documentRoot = getenv("PWD");
+			}
+			else {
+				$this->__documentRoot = $_SERVER["DOCUMENT_ROOT"];
+			}
+
+			$this->__config = Configuration::getSharedInstance([
+				"controllersPath" => $this->__documentRoot."/../app/controllers/",
+				"modelsPath" => $this->__documentRoot."/../app/models/",
+				"viewsPath" => $this->__documentRoot."/../app/views/",
+				"configPath" => $this->__documentRoot."/../config/",
+				"documentRoot" => $this->__documentRoot."/"
+			]);
+
+			require_once $this->__config->configPath."app.php";
+
+			$this->__routes = Routes::getSharedInstance($this);
+			require_once $this->__config->configPath."routes.php";
+
+			Database::getSharedInstance($this->__config->configPath."db.json", $this);
+
+			Model::staticInit();
+
 
 		}
 

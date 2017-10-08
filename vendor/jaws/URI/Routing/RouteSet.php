@@ -4,9 +4,17 @@
 
 		public $baseResource;
 		public $routes = [];
+		public $root;
 
 		function __construct($base = "/") {
+
 			$this->baseResource = $base;
+			$this->root = "";
+
+		}
+
+		function root($path) {
+			$this->root = $this->constructRoute("get", "/", $path, "root", [], null, true);
 		}
 
 		function resources($resources, $controller = null, $constraints = [], $childResources = null) {
@@ -123,7 +131,7 @@
 
 		}
 
-		private function constructRoute($method, $resource, $action, $name = "", $constraints = [], $childResources = null) {
+		private function constructRoute($method, $resource, $action, $name = "", $constraints = [], $childResources = null, $isRoot = false) {
 
 			$resource = $this->prependBaseResource($resource);
 
@@ -131,7 +139,14 @@
 
 			$resource = $this->normalizeParameterizedRoute($resource);
 
-			$this->routes[] = $this->constructRouteObject($resource, $action, $method, $name, $constraints, $params);
+			$routeObject = $this->constructRouteObject($resource, $action, $method, $name, $constraints, $params);
+
+			if (!$isRoot) {
+				$this->routes[] = $routeObject;
+			}
+			else {
+				return $routeObject;
+			}
 
 		}
 
