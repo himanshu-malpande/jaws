@@ -1,5 +1,10 @@
 {
 	"development": {
+		"database": "jaws_dev",
+		"username": "root",
+		"password": "password"
+	},
+	"test": {
 		"database": "jaws_test",
 		"username": "root",
 		"password": "password"
