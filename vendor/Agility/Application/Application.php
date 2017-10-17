@@ -13,23 +13,24 @@
 
 		private static $_instance = null;
 
-		static function getSharedInstance($env = false) {
+		static function getSharedInstance() {
 
 			if (empty(Application::$_instance)) {
-
-				if ($env === false) {
-					throw new Exception("Application environment not specified", 1);
-				}
-
-				Application::$_instance = new Application($env);
-
+				Application::$_instance = new Application();
 			}
+
 			return Application::$_instance;
 
 		}
 
-		private function __construct($env) {
+		private function __construct() {
+
+			$env = getenv("AGILITY_ENV");
+			if ($env === false) {
+				throw new Exception("Application environment not specified", 1);
+			}
 			$this->__environment = $env;
+
 		}
 
 		function run() {

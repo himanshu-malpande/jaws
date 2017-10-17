@@ -8,7 +8,7 @@
 
 	require_once "../vendor/Agility/autoloader.php";
 
-	$app = Application::getSharedInstance(getenv("JAWS_ENV"));
+	$app = Application::getSharedInstance();
 	$app->run();
 
 	$end = microtime(true);
