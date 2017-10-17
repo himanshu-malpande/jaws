@@ -3,15 +3,39 @@
 	class Model {
 
 		private $__db;
+		private $__hasMany;
+		private $__belongsTo;
+
+		protected $class;
 
 		private static $_db;
 
 		function __construct() {
+
 			$this->__db = Database::getSharedInstance();
+
+			$this->class = get_called_class();
+			$columns = Database::$tables->{$this->class}->all;
+			foreach ($columns as $name => $col) {
+				$this->$name = null;
+			}
+
 		}
 
 		static function staticInit() {
+
 			self::$_db = Database::getSharedInstance();
+
+			// Register autoloader for models
+			spl_autoload_register(function($model) {
+
+				$fileName = (Application::getSharedInstance())->config->modelsPath.$model.".php";
+				if (file_exists($fileName)) {
+					require_once($fileName);
+				}
+
+			});
+
 		}
 
 		static function query($queryString) {
@@ -24,11 +48,10 @@
 
 		static function insertMany($objects) {
 
-			$arrDiff = ["db" => 1, "created_at" => 2, "updated_at" => 3, "id" => 4];
+			$thisClass = get_called_class();
 
-			$query = "INSERT INTO ".strtolower(get_called_class());
-			unset($objects[0]->__db);
-			$cols = array_keys(array_diff_key((array)$objects[0], $arrDiff));
+			$query = "INSERT INTO ".$thisClass;
+			$cols = array_keys(Database::$tables->$thisClass->editables);
 			$vals = [];
 			foreach ($cols as $col) {
 				$vals[] = "?";
@@ -36,10 +59,7 @@
 			$query .= " (".implode(",", $cols).") VALUES (".implode(",", $vals).")";
 			$preparedQuery = self::$_db->prepare($query);
 			foreach ($objects as $object) {
-
-				unset($object->__db);
-				$preparedQuery->executePrepared(array_values(array_diff_key((array)$object, $arrDiff)));
-
+				$preparedQuery->executePrepared(array_values(array_intersect_key((array)$object, array_flip(Database::$tables->$thisClass->editables))));
 			}
 
 		}
@@ -53,7 +73,7 @@
 		 */
 		static function get($col, $value = null, $operation = "AND") {
 
-			$query = "SELECT * FROM ".strtolower(get_called_class())." WHERE ";
+			$query = "SELECT * FROM ".$this->class." WHERE ";
 
 			if (is_array($col)) {
 
@@ -87,13 +107,13 @@
 
 			$query .= ";";
 
-			return self::$_db->query($query, get_called_class());
+			return self::$_db->query($query, $this->class);
 
 		}
 
 		function save() {
 
-			if (get_called_class() == "Model") {
+			if ($this->class == "Model") {
 				throw new Exception("Cannot save object of class Model to database", 1);
 			}
 
@@ -103,15 +123,15 @@
 				$cols = [];
 				$vals = [];
 
-				$query = "INSERT INTO ".strtolower(get_called_class())." ";
-				foreach ($this as $key => $value) {
+				$query = "INSERT INTO ".$this->class." ";
+				foreach (Database::$tables->{$this->class}->editables as $col) {
 
-					if ($key == "__db" || $key == "updated_at" || $key == "id") {
-						continue;
+					if (!empty($this->$col)) {
+
+						$cols[] = $col;
+						$vals[] = $this->__db->sanitize($this->$col);
+
 					}
-
-					$cols[] = $key;
-					$vals[] = $this->__db->sanitize($value);
 
 				}
 
@@ -126,17 +146,14 @@
 				$query = "";
 				$vals = [];
 
-				$query = "UPDATE ".strtolower(get_called_class())." SET ";
-				foreach ($this as $key => $value) {
+				$query = "UPDATE ".$this->class." SET ";
+				foreach (Database::$tables->{$this->class}->editables as $col) {
 
-					if ($key == "__db" || $key == "updated_at" || $key == "id" || $key == "created_at") {
-						continue;
-					}
-					if (is_null($value)) {
-						$vals[] = $key."=NULL";
+					if (is_null($this->$col)) {
+						$vals[] = $col."=NULL";
 					}
 					else {
-						$vals[] = $key."=".$this->__db->sanitize($value);
+						$vals[] = $col."=".$this->__db->sanitize($this->$col);
 					}
 
 				}
@@ -156,6 +173,41 @@
 			foreach ($me as $key => $value) {
 				$this->$key = $value;
 			}
+
+		}
+
+		function hasMany(...$models) {
+
+			if (count($models) > 1) {
+
+				foreach ($models as $model) {
+					$this->addHasManyClass($model);
+				}
+
+			}
+			else {
+				$this->addHasManyClass($models);
+			}
+
+		}
+
+		function belongsTo($model) {
+
+			if (get_parent_class($model) != "Model") {
+				throw new Exception("$model is not a subclass of Model", 1);
+			}
+
+			$this->__belongsTo[] = $model;
+
+		}
+
+		private function addHasManyClass($model) {
+
+			if (get_parent_class($model) != "Model") {
+				throw new Exception("$model is not a subclass of Model", 1);
+			}
+
+			$this->__hasMany[] = $model;
 
 		}
 

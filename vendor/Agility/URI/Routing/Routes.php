@@ -15,6 +15,7 @@
 	// *	handler: Controller and its action combined
 	class Routes {
 
+		public $loadedFromCache = false;
 		// All private members of the class Routes are accessible without the leading "__"
 		// unless explicited denied in the __get magic method
 
@@ -65,8 +66,34 @@
 
 			// Register autoloader for controllers
 			spl_autoload_register(function($controller) {
-				require_once($this->__application->config->controllersPath.$controller.".php");
+
+				$fileName = $this->__application->config->controllersPath.$controller.".php";
+				if (file_exists($fileName)) {
+					require_once($fileName);
+				}
+
 			});
+
+			if ($this->__application->Environment == "production") {
+
+				$routesStr = cacheControl("routes");
+				if ($routesStr !== "") {
+
+					$routes = unserialize($routesStr);
+					$this->__get = $routes["get"];
+					$this->__post = $routes["post"];
+					$this->__put = $routes["put"];
+					$this->__patch = $routes["patch"];
+					$this->__delete = $routes["delete"];
+					$this->__options = $routes["options"];
+					$this->__root = $routes["root"];
+					$routes = null;
+
+					$this->loadedFromCache = true;
+
+				}
+
+			}
 
 		}
 
@@ -103,6 +130,18 @@
 			}
 
 			$routeSet = null;
+
+			$routes = [
+				"get" => $this->__get,
+				"post" => $this->__post,
+				"put" => $this->__put,
+				"patch" => $this->__patch,
+				"delete" => $this->__delete,
+				"options" => $this->__options,
+				"root" => $this->__root
+			];
+
+			cacheControl("routes", serialize($routes));
 
 		}
 

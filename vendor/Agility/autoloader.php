@@ -8,6 +8,8 @@
 			"Application" => "Application/Application",
 			"Configuration" => "Application/Configuration",
 			"Database" => "Data/Database",
+			"Table" => "Data/Table",
+			"Column" => "Data/Column",
 			"Routes" => "URI/Routing/Routes",
 			"RouteSet" => "URI/Routing/RouteSet",
 			"Route" => "URI/Routing/Route",

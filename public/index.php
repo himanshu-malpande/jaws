@@ -6,7 +6,7 @@
 		die(error_get_last() !== null ? print_r(error_get_last()) : "");
 	});
 
-	require_once "../vendor/jaws/autoloader.php";
+	require_once "../vendor/Agility/autoloader.php";
 
 	$app = Application::getSharedInstance(getenv("JAWS_ENV"));
 	$app->run();

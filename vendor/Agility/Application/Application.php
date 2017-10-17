@@ -103,12 +103,14 @@
 			require_once $this->__config->configPath."app.php";
 
 			$this->__routes = Routes::getSharedInstance($this);
-			require_once $this->__config->configPath."routes.php";
+
+			if ($this->__routes->loadedFromCache === false) {
+				require_once $this->__config->configPath."routes.php";
+			}
 
 			Database::getSharedInstance($this->__config->configPath."db.json", $this);
 
 			Model::staticInit();
-
 
 		}
 

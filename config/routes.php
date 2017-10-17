@@ -7,7 +7,7 @@
 		});
 		$this->resources("courses");
 
-		$this->root("students/show");
+		$this->root("home/index");
 
 		$this->get("courses/:course_id/students/:student_id", "enrollments/show");
 

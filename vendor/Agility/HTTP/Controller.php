@@ -2,9 +2,9 @@
 
 	class Controller {
 
-		public $app;
-		public $isCli;
-		public $contentFormat;
+		protected $app;
+		protected $isCli;
+		protected $contentFormat;
 
 		private $__beforeActions;
 		private $__afterActions;

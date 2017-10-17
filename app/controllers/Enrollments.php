@@ -1,6 +1,6 @@
 <?php
 
-	class Enrollments extends Controller {
+	class Enrollments extends ApplicationController {
 
 		function index($students_id = null) {
 			echo $students_id;
