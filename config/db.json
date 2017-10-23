@@ -8,5 +8,10 @@
 		"database": "jaws_test",
 		"username": "root",
 		"password": "password"
+	},
+	"production": {
+		"database": "jaws_dev",
+		"username": "root",
+		"password": "password"
 	}
 }

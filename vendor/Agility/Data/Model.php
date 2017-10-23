@@ -15,10 +15,6 @@
 			$this->__db = Database::getSharedInstance();
 
 			$this->class = get_called_class();
-			$columns = Database::$tables->{$this->class}->all;
-			foreach ($columns as $name => $col) {
-				$this->$name = null;
-			}
 
 		}
 
@@ -46,6 +42,10 @@
 			return self::$_db->exec($queryString);
 		}
 
+		static function sanitize($data) {
+			return self::$_db->sanitize($data);
+		}
+
 		static function insertMany($objects) {
 
 			$thisClass = get_called_class();
@@ -66,7 +66,7 @@
 
 		/**
 		 * Returns an array of objects that match the criteria
-		 * @param  mixed $col       Array: Array of multiple columns and values; String: Column name, if value is not null, else, a custom where clause ; Numeric: Value of ID column
+		 * @param  mixed $col       Array: Array of multiple columns and values; String: Column name, if value is not null, else, a custom where clause; Numeric: Value of ID column
 		 * @param  string/numeric $value     Value that is to be searched for the given column, only accepted if col is string, otherwise ignored
 		 * @param  enum $operation The operator, 'AND' or 'OR'
 		 * @return array            Array of objects matching the given criteria

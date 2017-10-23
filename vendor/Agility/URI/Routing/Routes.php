@@ -98,7 +98,7 @@
 		}
 
 		// All properties of class Routes are accessible without the leading "__"
-		function __get($key) {
+		function &__get($key) {
 
 			if (isset($this->{"__".$key})) {
 				return $this->{"__".$key};
@@ -110,7 +110,7 @@
 
 		// All Properties of the instance of class Routes are read-only
 		function __set($key, $value) {
-			throw new Exception("Cannot initialize read only property $key for type Routes", 1);
+			throw new Exception("Cannot modify read only property $key for type Routes", 1);
 		}
 
 		// Exposes the instance of class RouteSet to the $mapper callback
@@ -152,7 +152,7 @@
 			array_unshift($urlFragments, "/");
 			$this->{"__".$route->method} = RouteBuilder::buildTree($this->{"__".$route->method}, $urlFragments, count($urlFragments), 0, $route);
 
-			$routes->__namedRoutes[$route->name] = $route;
+			$this->__namedRoutes[$route->name] = $route;
 
 		}
 

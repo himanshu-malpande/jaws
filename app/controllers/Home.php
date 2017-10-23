@@ -4,9 +4,14 @@
 
 		function index() {
 
-			// $user = new User;
-			// $user->email = "suyog@jigsawacademy.com";
-			// $user->save();
+			$auth = UserAuth::authenticate("himanshu@jigsawacademy.com", "", "", "malpande");
+			if ($auth === false) {
+				$this->html(["error" => "Auth failed"]);
+				return;
+			}
+			if ($this->format->json) {
+				$this->json($auth[0]);
+			}
 
 		}
 

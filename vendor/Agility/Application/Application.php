@@ -13,7 +13,7 @@
 
 		private static $_instance = null;
 
-		static function getSharedInstance() {
+		static function &getSharedInstance() {
 
 			if (empty(Application::$_instance)) {
 				Application::$_instance = new Application();
@@ -35,6 +35,10 @@
 
 		function run() {
 
+			$start = microtime(true);
+
+			register_shutdown_function([$this, "applicationShutdown"]);
+
 			$this->initialize();
 
 			if (!$this->isCli()) {
@@ -52,6 +56,8 @@
 				$this->__routes->processRequest($args, "GET");
 
 			}
+
+			$end = microtime(true);
 
 		}
 
@@ -81,6 +87,14 @@
 				return true;
 			}
 			return false;
+
+		}
+
+		function applicationShutdown() {
+
+			if ($this->__environment == "development") {
+				die(error_get_last() !== null ? print_r(error_get_last()) : "");
+			}
 
 		}
 

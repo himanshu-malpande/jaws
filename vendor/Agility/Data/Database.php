@@ -64,6 +64,11 @@
 
 		private function dbInit() {
 
+			if (empty($this->dbSettings)) {
+				throw new Exception("Database settings for environment ".$this->__app->Environment." not specified", 1);
+
+			}
+
 			if (empty($this->dbSettings->host)) {
 				$this->dbSettings->host = "127.0.0.1";
 			}

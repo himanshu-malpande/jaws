@@ -112,8 +112,19 @@
 
 				foreach ($actions as $action) {
 
-					if (!in_array($action, $constraints["only"])) {
-						$action = false;
+					if (is_array($constraints["only"])) {
+
+						if (!in_array($action, $constraints["only"])) {
+							$action = false;
+						}
+
+					}
+					else {
+
+						if ($action != $constraints["only"]) {
+							$action = false;
+						}
+
 					}
 
 				}
@@ -121,8 +132,15 @@
 			}
 			else if (!empty($constraints["except"])) {
 
-				foreach ($constraints["except"] as $action) {
-					$actions[$action] = false;
+				if (is_array($constraints["except"])) {
+
+					foreach ($constraints["except"] as $action) {
+						$actions[$action] = false;
+					}
+
+				}
+				else {
+					$actions[$constraints["except"]] = false;
 				}
 
 			}
