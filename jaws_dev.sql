@@ -3,9 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: Oct 30, 2017 at 10:25 AM
--- Server version: 5.7.20
--- PHP Version: 7.1.10-1+ubuntu16.04.1+deb.sury.org+1
+-- Generation Time: Nov 03, 2017 at 11:19 AM
+-- Server version: 5.7.19
+-- PHP Version: 7.2.0RC2
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 SET AUTOCOMMIT = 0;
@@ -38,7 +38,7 @@ CREATE TABLE `Course` (
   `position` int(10) UNSIGNED NOT NULL,
   `durationLength` int(11) DEFAULT NULL,
   `durationUnit` enum('days','months','years') DEFAULT NULL,
-  `status` enum('published','unpublished','draft','deleted','hidden') NOT NULL DEFAULT 'draft',
+  `statusId` int(11) UNSIGNED NOT NULL DEFAULT '6' COMMENT 'Possible statuses are: ''published'',''unpublished'',''draft'',''deleted'',''hidden''',
   `createdBy` int(10) UNSIGNED NOT NULL,
   `updatedBy` int(10) UNSIGNED DEFAULT NULL,
   `deletedBy` int(10) UNSIGNED DEFAULT NULL,
@@ -61,7 +61,7 @@ CREATE TABLE `CourseSection` (
   `sisId` varchar(16) NOT NULL,
   `startDate` date DEFAULT NULL,
   `endDate` date DEFAULT NULL,
-  `status` enum('active','draft','deleted','expired') NOT NULL DEFAULT 'draft',
+  `statusId` int(10) UNSIGNED NOT NULL DEFAULT '6' COMMENT 'Possible statuses are: ''active'',''draft'',''deleted'',''expired''',
   `createdAt` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updatedAt` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -78,7 +78,7 @@ CREATE TABLE `Currency` (
   `code` varchar(3) NOT NULL,
   `exchangeRate` decimal(9,2) DEFAULT NULL,
   `addedBy` int(10) UNSIGNED NOT NULL,
-  `status` enum('draft','active','disabled','deleted') NOT NULL DEFAULT 'active',
+  `statusId` int(10) UNSIGNED NOT NULL DEFAULT '1' COMMENT 'Possible statuses are: ''draft'',''active'',''disabled'',''deleted''',
   `createdAt` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updatedAt` datetime NOT NULL ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -429,8 +429,38 @@ CREATE TABLE `Refund` (
 DROP TABLE IF EXISTS `Status`;
 CREATE TABLE `Status` (
   `id` int(10) UNSIGNED NOT NULL,
-  `code` varchar(16) NOT NULL
+  `code` varchar(16) NOT NULL,
+  `description` text,
+  `createdAt` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updatedAt` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Dumping data for table `Status`
+--
+
+INSERT INTO `Status` (`id`, `code`, `description`, `createdAt`, `updatedAt`) VALUES
+(1, 'active', NULL, '2017-11-03 15:18:07', '2017-11-03 15:18:07'),
+(2, 'approved', NULL, '2017-11-03 15:18:07', '2017-11-03 15:18:07'),
+(3, 'blocked', NULL, '2017-11-03 15:18:07', '2017-11-03 15:18:07'),
+(4, 'deleted', NULL, '2017-11-03 15:18:07', '2017-11-03 15:18:07'),
+(5, 'disabled', NULL, '2017-11-03 15:18:07', '2017-11-03 15:18:07'),
+(6, 'draft', NULL, '2017-11-03 15:18:07', '2017-11-03 15:18:07'),
+(7, 'executed', NULL, '2017-11-03 15:18:07', '2017-11-03 15:18:07'),
+(8, 'expired', NULL, '2017-11-03 15:18:07', '2017-11-03 15:18:07'),
+(9, 'failed', NULL, '2017-11-03 15:18:07', '2017-11-03 15:18:07'),
+(10, 'frozen', NULL, '2017-11-03 15:18:07', '2017-11-03 15:18:07'),
+(11, 'fulfilled', NULL, '2017-11-03 15:18:07', '2017-11-03 15:18:07'),
+(12, 'hidden', NULL, '2017-11-03 15:18:07', '2017-11-03 15:18:07'),
+(13, 'inactive', NULL, '2017-11-03 15:18:07', '2017-11-03 15:18:07'),
+(14, 'obsolete', NULL, '2017-11-03 15:18:07', '2017-11-03 15:18:07'),
+(15, 'paid', NULL, '2017-11-03 15:18:07', '2017-11-03 15:18:07'),
+(16, 'pending', NULL, '2017-11-03 15:18:07', '2017-11-03 15:18:07'),
+(17, 'processed', NULL, '2017-11-03 15:18:07', '2017-11-03 15:18:07'),
+(18, 'published', NULL, '2017-11-03 15:18:07', '2017-11-03 15:18:07'),
+(19, 'rejected', NULL, '2017-11-03 15:18:07', '2017-11-03 15:18:07'),
+(20, 'removed', NULL, '2017-11-03 15:18:07', '2017-11-03 15:18:07'),
+(21, 'unpublished', NULL, '2017-11-03 15:18:07', '2017-11-03 15:18:07');
 
 -- --------------------------------------------------------
 
@@ -568,24 +598,24 @@ CREATE TABLE `UserSession` (
 ALTER TABLE `Course`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `position` (`position`),
-  ADD KEY `sis_id` (`sisId`),
-  ADD KEY `status` (`status`),
-  ADD KEY `created_at` (`createdAt`),
   ADD KEY `courseCreatorUserId` (`createdBy`),
   ADD KEY `courseUpdatorUserId` (`updatedBy`),
-  ADD KEY `courseDeleterUserId` (`deletedBy`);
+  ADD KEY `courseDeleterUserId` (`deletedBy`),
+  ADD KEY `sisId` (`sisId`) USING BTREE,
+  ADD KEY `statusId` (`statusId`) USING BTREE,
+  ADD KEY `createdAt` (`createdAt`) USING BTREE;
 
 --
 -- Indexes for table `CourseSection`
 --
 ALTER TABLE `CourseSection`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `course_id` (`courseId`,`startDate`),
-  ADD KEY `sis_id` (`sisId`),
-  ADD KEY `end_date` (`endDate`),
-  ADD KEY `status` (`status`),
-  ADD KEY `created_at` (`createdAt`),
-  ADD KEY `delivery_mode_id` (`deliveryModeId`);
+  ADD KEY `courseId` (`courseId`,`startDate`) USING BTREE,
+  ADD KEY `sisId` (`sisId`) USING BTREE,
+  ADD KEY `endDate` (`endDate`) USING BTREE,
+  ADD KEY `createdAt` (`createdAt`) USING BTREE,
+  ADD KEY `deliveryModeId` (`deliveryModeId`) USING BTREE,
+  ADD KEY `statusId` (`statusId`) USING BTREE;
 
 --
 -- Indexes for table `Currency`
@@ -595,7 +625,7 @@ ALTER TABLE `Currency`
   ADD UNIQUE KEY `code` (`code`),
   ADD KEY `createdAt` (`createdAt`),
   ADD KEY `updatedAt` (`updatedAt`),
-  ADD KEY `status` (`status`),
+  ADD KEY `status` (`statusId`),
   ADD KEY `addedBy` (`addedBy`);
 
 --
@@ -806,7 +836,9 @@ ALTER TABLE `Refund`
 --
 ALTER TABLE `Status`
   ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `code` (`code`);
+  ADD UNIQUE KEY `code` (`code`),
+  ADD KEY `createdAt` (`createdAt`),
+  ADD KEY `updatedAt` (`updatedAt`);
 
 --
 -- Indexes for table `User`
@@ -989,6 +1021,12 @@ ALTER TABLE `Refund`
   MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
+-- AUTO_INCREMENT for table `Status`
+--
+ALTER TABLE `Status`
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
+
+--
 -- AUTO_INCREMENT for table `User`
 --
 ALTER TABLE `User`
@@ -1026,21 +1064,24 @@ ALTER TABLE `UserSession`
 -- Constraints for table `Course`
 --
 ALTER TABLE `Course`
-  ADD CONSTRAINT `courseCreatorUserId` FOREIGN KEY (`createdBy`) REFERENCES `User` (`id`),
-  ADD CONSTRAINT `courseDeleterUserId` FOREIGN KEY (`deletedBy`) REFERENCES `User` (`id`),
-  ADD CONSTRAINT `courseUpdatorUserId` FOREIGN KEY (`updatedBy`) REFERENCES `User` (`id`);
+  ADD CONSTRAINT `courseCreatorUserIdFk` FOREIGN KEY (`createdBy`) REFERENCES `User` (`id`),
+  ADD CONSTRAINT `courseDeleterUserIdFk` FOREIGN KEY (`deletedBy`) REFERENCES `User` (`id`),
+  ADD CONSTRAINT `courseStatusIdStatusIdFk` FOREIGN KEY (`statusId`) REFERENCES `Status` (`id`),
+  ADD CONSTRAINT `courseUpdatorUserIdFk` FOREIGN KEY (`updatedBy`) REFERENCES `User` (`id`);
 
 --
 -- Constraints for table `CourseSection`
 --
 ALTER TABLE `CourseSection`
   ADD CONSTRAINT `sectionCourseIdFk` FOREIGN KEY (`courseId`) REFERENCES `Course` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `sectionDeliveryModeIdFk` FOREIGN KEY (`deliveryModeId`) REFERENCES `DeliveryMode` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+  ADD CONSTRAINT `sectionDeliveryModeIdFk` FOREIGN KEY (`deliveryModeId`) REFERENCES `DeliveryMode` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `sectionStatusIdStatusIdFk` FOREIGN KEY (`statusId`) REFERENCES `Status` (`id`);
 
 --
 -- Constraints for table `Currency`
 --
 ALTER TABLE `Currency`
+  ADD CONSTRAINT `currencyStatusIdFk` FOREIGN KEY (`statusId`) REFERENCES `Status` (`id`),
   ADD CONSTRAINT `currencyUserIdFk` FOREIGN KEY (`addedBy`) REFERENCES `User` (`id`);
 
 --
