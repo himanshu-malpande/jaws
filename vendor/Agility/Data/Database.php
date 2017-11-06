@@ -140,22 +140,7 @@
 				else {
 					Database::$tables = unserialize($dbStructStr);
 				}
-/*
-				// Try loading the database structure file
-				if (file_exists(__DIR__."/config/db.agl")) {
 
-					$dbStruct = file_get_contents(__DIR__."/config/db.agl");
-					Database::$tables = unserialize($dbStruct);
-
-				}
-				else {
-
-					$this->getDbStructure();
-					$dbStructStr = serialize(Database::$tables);
-					die(file_put_contents(__DIR__."/config/db.agl", $dbStructStr, LOCK_EX));
-
-				}
-*/
 			}
 
 		}
